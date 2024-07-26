@@ -13,7 +13,7 @@ echo ""
 GH_APP_WRAPPER_HOME="$HOME/.gh-app-wrapper"
 
 # GH app wrapper tool latest release URL
-GH_AUTH_WRAPPER_URL="TBD"
+GH_AUTH_WRAPPER_URL="https://raw.githubusercontent.com/adheus/gh-app-wrapper/main/gh-app.sh"
 
 
 PROFILE_RC="$HOME/.zshrc"
