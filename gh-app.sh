@@ -57,12 +57,12 @@ setup() {
         {
             echo "";
             echo "# gh-app configuration";
-            echo 'export PATH="$HOME/.gh-app/bin:$PATH"';
+            echo 'export PATH="$HOME/.gh-app-wrapper/bin:$PATH"';
         } >>"$PROFILE_RC"
     fi
 
     # Let's make script available in this session too
-    export PATH="$HOME/.gh-app/bin:$PATH"
+    export PATH="$HOME/.gh-app-wrapper/bin:$PATH"
     
     # Check for brew installation
     if ! command -v brew &> /dev/null
@@ -163,7 +163,6 @@ authenticate() {
     # Use the token to authenticate gh
     gh auth login --with-token $token
 }
-
 
 if [ "$1" == "auth" ]; then
     authenticate
