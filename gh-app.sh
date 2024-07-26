@@ -3,13 +3,6 @@
 set -o pipefail
 
 GH_APP_WRAPPER_VERSION="0.0.1"
-echo ""
-echo "################################"
-echo "#      GH APP WRAPPER TOOL     #"
-echo "#         version $GH_APP_WRAPPER_VERSION        #"
-echo "################################"
-echo ""
-
 GH_APP_WRAPPER_HOME="$HOME/.gh-app-wrapper"
 
 # GH app wrapper tool latest release URL
@@ -24,6 +17,12 @@ fi
 
 # Downloads latest gh app wrapper script and store it 
 setup() {
+    echo ""
+    echo "################################"
+    echo "#      GH APP WRAPPER TOOL     #"
+    echo "#         version $GH_APP_WRAPPER_VERSION        #"
+    echo "################################"
+    echo ""
     echo "Installing gh app wrapper tool..."
     GH_APP_WRAPPER_BIN="$GH_APP_WRAPPER_HOME/bin"
     if [[ ! -d "$GH_APP_WRAPPER_BIN" ]]; then
@@ -95,7 +94,10 @@ setup() {
     fi
 
     # Add gh-app to resolve credentials
-    git config --global credential.helper '!gh-app auth'
+    git config --global credential.helper '!gh-app auth git-credential'
+
+    echo ""
+    echo "GH APP WRAPPER TOOL INSTALLED SUCCESSFULLY"
 }
 
 
@@ -152,21 +154,28 @@ authenticate() {
     # Create JWT
     JWT="${header_payload}"."${signature}"
 
-    reponse=$(curl -s --request POST \
+    response=$(curl -s --request POST \
       --url "https://api.github.com/app/installations/$installation_id/access_tokens" \
       --header "Accept: application/vnd.github+json" \
       --header "Authorization: Bearer $JWT" \
       --header "X-GitHub-Api-Version: 2022-11-28")
 
-    token=$($reponse | jq -r '.token')
+    # Store token in a file
+    token=$(echo $response | jq -r '.token')
+    TOKEN_PATH="$HOME/.gh-app-wrapper/token.txt"
+    echo $token > $TOKEN_PATH
 
     # Use the token to authenticate gh
-    gh auth login --with-token $token
+    gh auth login --with-token < $TOKEN_PATH
+
+    # Remove token file
+    rm $TOKEN_PATH
 }
 
-if [ "$1" == "auth" ]; then
+# If we have arguments, authenticate and call gh with the arguments
+if [ $# -gt 0 ]; then
     authenticate
-    gh auth git-credential
+    gh $@
 else
     setup
 fi
